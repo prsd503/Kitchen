@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Kitchen Inventory App</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f4f4; margin: 2em; }
+        h2 { color: #333; }
+        form { background: #fff; padding: 1em; margin-bottom: 2em; border-radius: 5px; }
+        label { display: block; margin-top: 1em; }
+        input { padding: 0.3em; margin-top: 0.2em; }
+        button { margin-top: 1em; padding: 0.5em 1em; }
+        table { width: 100%; background: #fff; border-collapse: collapse; margin-top: 1em; }
+        th, td { padding: 0.6em; border: 1px solid #ddd; text-align: left; }
+        th { background: #eee; }
+        #downloadHTML { margin-top: 1em; }
+    </style>
+</head>
+<body>
+    <h2>Kitchen Inventory</h2>
+    <form id="productForm">
+        <label>
+            Product Name:
+            <input type="text" id="name" required />
+        </label>
+        <label>
+            Quantity:
+            <input type="number" id="quantity" min="1" required />
+        </label>
+        <label>
+            Where is it kept:
+            <input type="text" id="location" required />
+        </label>
+        <button type="submit">Add Item</button>
+    </form>
+
+    <button id="downloadCSV">Download CSV</button>
+    <button id="downloadHTML">Download This App</button>
+
+    <table id="productTable">
+        <thead>
+            <tr>
+                <th>Product Name</th>
+                <th>Quantity</th>
+                <th>Where Is It Kept</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        const productForm = document.getElementById('productForm');
+        const productTable = document.getElementById('productTable').getElementsByTagName('tbody')[0];
+        const downloadBtnCSV = document.getElementById('downloadCSV');
+        const downloadBtnHTML = document.getElementById('downloadHTML');
+        let products = [];
+
+        productForm.onsubmit = function(event) {
+            event.preventDefault();
+            const name = document.getElementById('name').value.trim();
+            const quantity = document.getElementById('quantity').value.trim();
+            const location = document.getElementById('location').value.trim();
+
+            if (name && quantity && location) {
+                const product = { name, quantity, location };
+                products.push(product);
+                addRow(product);
+                productForm.reset();
+            }
+        };
+
+        function addRow(product) {
+            const row = productTable.insertRow();
+            row.insertCell(0).innerText = product.name;
+            row.insertCell(1).innerText = product.quantity;
+            row.insertCell(2).innerText = product.location;
+        }
+
+        downloadBtnCSV.onclick = function() {
+            if (products.length === 0) return alert('No products to download!');
+            let csv = "Product Name,Quantity,Where Is It Kept\n";
+            products.forEach(p => {
+                csv += `"${p.name}","${p.quantity}","${p.location}"\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'kitchen_inventory.csv';
+            a.click();
+            window.URL.revokeObjectURL(url);
+        };
+
+        downloadBtnHTML.onclick = function() {
+            const htmlContent = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Kitchen Inventory App</title>
+<style>
+    body { font-family: Arial, sans-serif; background: #f4f4f4; margin: 2em; }
+    h2 { color: #333; }
+    form { background: #fff; padding: 1em; margin-bottom: 2em; border-radius: 5px; }
+    label { display: block; margin-top: 1em; }
+    input { padding: 0.3em; margin-top: 0.2em; }
+    button { margin-top: 1em; padding: 0.5em 1em; }
+    table { width: 100%; background: #fff; border-collapse: collapse; margin-top: 1em; }
+    th, td { padding: 0.6em; border: 1px solid #ddd; text-align: left; }
+    th { background: #eee; }
+</style>
+</head>
+<body>
+<h2>Kitchen Inventory</h2>
+<form id="productForm">
+    <label>Product Name:<input type="text" id="name" required /></label>
+    <label>Quantity:<input type="number" id="quantity" min="1" required /></label>
+    <label>Where is it kept:<input type="text" id="location" required /></label>
+    <button type="submit">Add Item</button>
+</form>
+<button id="downloadCSV">Download CSV</button>
+<table id="productTable">
+<thead><tr><th>Product Name</th><th>Quantity</th><th>Where Is It Kept</th></tr></thead>
+<tbody></tbody>
+</table>
+<script>
+const productForm = document.getElementById('productForm');
+const productTable = document.getElementById('productTable').getElementsByTagName('tbody')[0];
+const downloadBtnCSV = document.getElementById('downloadCSV');
+let products = [];
+productForm.onsubmit = function(event) {
+    event.preventDefault();
+    const name = document.getElementById('name').value.trim();
+    const quantity = document.getElementById('quantity').value.trim();
+    const location = document.getElementById('location').value.trim();
+    if (name && quantity && location) {
+        const product = { name, quantity, location };
+        products.push(product);
+        addRow(product);
+        productForm.reset();
+    }
+};
+function addRow(product) {
+    const row = productTable.insertRow();
+    row.insertCell(0).innerText = product.name;
+    row.insertCell(1).innerText = product.quantity;
+    row.insertCell(2).innerText = product.location;
+}
+downloadBtnCSV.onclick = function() {
+    if (products.length === 0) return alert('No products to download!');
+    let csv = "Product Name,Quantity,Where Is It Kept\\n";
+    products.forEach(p => {
+        csv += \`"\${p.name}","\${p.quantity}","\${p.location}"\\n\`;
+    });
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'kitchen_inventory.csv';
+    a.click();
+    window.URL.revokeObjectURL(url);
+};
+<\/script>
+</body>
+</html>
+`;
+            const blob = new Blob([htmlContent], { type: 'text/html' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'kitchen_inventory.html';
+            a.click();
+            window.URL.revokeObjectURL(url);
+        };
+    </script>
+</body>
+</html>
